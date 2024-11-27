@@ -1,0 +1,6 @@
+Sample,Género mayoritario,Especie mayoritaria,Subespecie,MLST,Serotype,K/O locus,Posibles contaminantes,Carba adquirida,BLEE adquirida,Otras,Nº genes AMR,AMRscore,VIRscore,Esquema MLST,alelo #1,alelo #2,alelo #3,alelo #4,alelo #5,alelo #6,alelo #7,MLSTs posibles,Alelos posibles
+Eclo_SR_04197,Enterobacter   (87%),Enterobacter hormaechei  (63%),Enterobacter hormaechei subsp. steigerwaltii,113,-:-,KL43/O3/O3a,-,-,-,ACT-43*,3,0,0,ecloacae,dnaA(4),fusA(22),gyrB(68),leuS(69),pyrG(37),rplB(4),rpoB(24),,
+Kpne_VR_29155,Klebsiella   (90%),Klebsiella pneumoniae  (81%),Klebsiella pneumoniae,219,-:-,KL114/O1/O2v1,-,-,CTX-M-15,-,11,1,1,klebsiella,gapA(2),infB(1),mdh(2),pgi(3),phoE(27),rpoB(1),tonB(39),,
+Pmir_SG_98615,Proteus   (89%),Proteus mirabilis  (89%),Proteus mirabilis,-,-:-,KL161/-,-,-,-,TEM-2,3,0,0,No tiene esquema asociado,,,,,,,,,
+Pstu_VR_28886,Providencia   (70%),Providencia stuartii  (65%),Providencia stuartii,-,-:-,KL15/-,Escherichia coli  (5%),-,-,TEM-2,8,0,0,No tiene esquema asociado,,,,,,,,,
+Sent_VG_27645,Salmonella   (82%),Salmonella enterica  (60%),"Salmonella enterica subsp. enterica serovar 4,5,12:i-",34,-:-,KL156-D1/O3/O3a,Escherichia coli  (8%),-,-,TEM-1D,2,0,0,senterica_achtman_2,aroC(10),dnaN(19),hemD(12),hisD(9),purE(5),sucA(9),thrA(2),,
