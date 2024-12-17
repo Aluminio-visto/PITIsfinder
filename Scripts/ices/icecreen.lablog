@@ -1,0 +1,22 @@
+# Para instalar el entorno con lo necesario
+conda create --name icecreen --file icecreen_env.txt
+
+# OJO! También hay que cambiar el path de las bases de datos que llama ice_characterize.sh antes de la primera ejecución
+
+# Desde la carpeta donde se realizan los análisis
+# Copiamos todos los cromosomas a la carpeta ICE, renombrando con id de la muestra
+mkdir 10_ices
+for i in $(cat samples); do cp 08_Anotacion/$i/mob_recon/chromosome.fasta 10_ices/$i".fasta"; done
+
+# creamos archivo sample.txt, necesario para la ejecución del detector de ices
+cd 10_ices
+ls *.fasta > samples.txt
+
+# ejecutamos el detector
+conda activate icecreen
+bash ~/Programs/ICEcreen/ice_characterize.sh -i samples.txt -o anotacion
+python3 ~/Programs/ICEcreen/ice_parser.py -p ./
+conda deactivate
+
+cp tables/ICE_summary.csv ..
+cd ..
