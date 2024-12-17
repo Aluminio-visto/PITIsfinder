@@ -1,0 +1,10 @@
+for i in $(ls *.fasta); do
+     file=$(echo $i | rev | cut -f2- -d'.' | rev);
+     mkdir -p phastest_deep/"$file"/;
+      cp "$i" ~/Descargas/phastest-docker/phastest_inputs/;
+     docker compose -f /home/usuario/Descargas/phastest-docker/docker-compose.yml down --remove-orphans;
+     docker compose -f /home/usuario/Descargas/phastest-docker/docker-compose.yml run phastest -i fasta -m deep -s $i --phage-only --yes;
+      cp -r /home/usuario/Descargas/phastest-docker/phastest-app-docker/JOBS/"$file" phastest_deep/;
+     sudo rm -r /home/usuario/Descargas/phastest-docker/phastest-app-docker/JOBS/"$file";
+done
+

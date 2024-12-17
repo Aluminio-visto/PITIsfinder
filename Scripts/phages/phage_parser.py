@@ -6,6 +6,7 @@ import glob
 import subprocess
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
+import re
 
 # %%
 def read_summary(infile):
@@ -41,15 +42,12 @@ def process_blastn(df_blast):
     return subdf
 
 def extract_fasta(df, phage_fna, output_dir):
-    
     fasta_sequences = {record.id: record for record in SeqIO.parse(phage_fna, "fasta")}
 
     # Recorrer cada fila del DataFrame
     for _, row in df.iterrows():
         fago = row['Fago']
-        
-        cluster = row['Cluster'].replace('/', '_')
-        
+        cluster = row['Cluster']
         
         # Obtener la secuencia correspondiente al contig
         if fago not in fasta_sequences:
@@ -59,7 +57,8 @@ def extract_fasta(df, phage_fna, output_dir):
         full_sequence = fasta_sequences[fago].seq
         
         # Crear un registro SeqRecord
-        record_id = f"{cluster}_{fago}_{sample}"
+        cluster_alnum = re.sub(r'[^a-zA-Z0-9-_]', '_', cluster)
+        record_id = f"{cluster_alnum}_{fago}_{sample}"
         seq_record = SeqRecord(
             full_sequence,
             id=record_id,
@@ -81,16 +80,12 @@ if __name__ == "__main__":
                                         'PHAGE+HYPO_PROTEIN_PERCENTAGE', 'ATT_SITE_SHOWUP'])
     for phage_path in glob.glob(f'{original_path}/09_phages/phastest_deep/*/'):
         # Extraer archivos necesarios
-        
         sample = phage_path.split('/')[-2]
         phage_sum = os.path.join(phage_path, 'summary.txt')
         phage_fna = os.path.join(phage_path, 'region_DNA.txt')
-        assembly_fasta = os.path.join(original_path, f'03_assemblies/{sample}/assembly.fasta')
-        print('Sample: ', sample)
-        # print('phage sum', phage_sum)
-        # print('phage fna', phage_fna)
-        # print('assembly fasta:', assembly_fasta)
-        # print('phage path', phage_path)
+        assembly_fasta = os.path.join(original_path, f'03_assemblies/{sample}.fasta')
+
+        print(sample)
         # si tenemos todos los archivos disponibles
         if os.path.isfile(phage_sum) and os.path.isfile(phage_fna) and os.path.isfile(assembly_fasta):
             # procesar el summary
