@@ -1,0 +1,10 @@
+# ejecutamos integron_finder
+conda activate integron_finder
+for i in $(cat samples); do 
+    integron_finder 03_assemblies/${i}/assembly.fasta --cpu 30 --outdir 08_Anotacion/${i}/integrones --func-annot --gbk;
+done
+# en el entorno que queda tenemos que tener prokka, abricate y biopython>=1.80
+conda deactivate
+# el entorno adjunto en la carpeta funciona para el parseo (es nano, pero con abricate, no hay incompatibilidades). Para instalarlo:
+# conda create --name integrones_env.txt --file <this file>
+python3 ~/Programs/integron_parser.py .
