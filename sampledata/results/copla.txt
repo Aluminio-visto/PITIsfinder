@@ -1,0 +1,85 @@
+Copla results
+Sample: Eclo_VC_28100
+Contig: AA002
+PTU could not be assigned
+Query is part of a graph component of size 1
+However, at least four members are required for PTU assignation
+This plasmid could form part of a new, still unnamed, PTU
+Other info:
+  Size:	65485
+  MOB:	MOBP
+  MPF:	-
+  Repl:	IncL/M(pOXA-48)
+  AMR:	OXA-48
+Sample: Eclo_VC_28100
+Contig: AA739
+PTU could not be assigned
+Query is part of a graph component of size 1
+However, at least four members are required for PTU assignation
+This plasmid could form part of a new, still unnamed, PTU
+Other info:
+  Size:	306271
+  MOB:	MOBH
+  MPF:	-
+  Repl:	IncHI2;IncHI2A
+  AMR:	AAC(3)-IIe;AAC(6')-Ib-cr;AAC(6')-Ib7;ANT(3'')-IIa;APH(3'')-Ib;APH(6)-Id;CTX-M-15;OXA-1;QnrB6;TEM-181;catB3;catI;dfrA14;sul2;tet(A)
+Sample: Eclo_VC_28100
+Contig: AB040
+PTU could not be assigned
+Query is part of a graph component of size 1
+However, at least four members are required for PTU assignation
+This plasmid could form part of a new, still unnamed, PTU
+Other info:
+  Size:	8308
+  MOB:	-
+  MPF:	-
+  Repl:	-
+  AMR:	-
+Sample: Kpne_VC_46536
+Contig: AA002
+PTU could not be assigned
+Query is part of a graph component of size 1
+However, at least four members are required for PTU assignation
+This plasmid could form part of a new, still unnamed, PTU
+Other info:
+  Size:	63094
+  MOB:	MOBP
+  MPF:	-
+  Repl:	IncL/M(pOXA-48)
+  AMR:	OXA-48
+Sample: Kpne_VC_46536
+Contig: AA275
+PTU could not be assigned
+Query is part of a graph component of size 1
+However, at least four members are required for PTU assignation
+This plasmid could form part of a new, still unnamed, PTU
+Other info:
+  Size:	212878
+  MOB:	-
+  MPF:	-
+  Repl:	IncFIB(K);IncFII(K)
+  AMR:	AAC(6')-Ib7;aadA2;catI;dfrA12;qacEdelta1;sul1
+Sample: Kpne_VC_46536
+Contig: AA552
+PTU could not be assigned
+Query is part of a graph component of size 1
+However, at least four members are required for PTU assignation
+This plasmid could form part of a new, still unnamed, PTU
+Other info:
+  Size:	78891
+  MOB:	MOBF
+  MPF:	-
+  Repl:	IncR
+  AMR:	AAC(6')-Ib-cr;AAC(6')-Ib7;AAC(6')-Ib7;APH(3'')-Ib;APH(6)-Id;OXA-1;QnrS1;catB3;dfrA14;mphA;sul2;tet(A)
+Sample: Kpne_VC_46536
+Contig: AA976
+PTU could not be assigned
+Query is part of a graph component of size 1
+However, at least four members are required for PTU assignation
+This plasmid could form part of a new, still unnamed, PTU
+Other info:
+  Size:	7447
+  MOB:	MOBQ
+  MPF:	-
+  Repl:	Col156
+  AMR:	-

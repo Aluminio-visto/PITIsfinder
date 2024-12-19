@@ -1,0 +1,13 @@
+sample,Fago,contig,Start,End,length,Cluster,COMPLETENESS(score),SPECIFIC_KEYWORD,TOTAL_PROTEIN_NUM,PHAGE+HYPO_PROTEIN_PERCENTAGE,ATT_SITE_SHOWUP
+Eclo_VC_28100,1,contig_1,231297,276326,45030,PHAGE_Escher_RCS47_NC_042128,intact(150),"transposase,recombinase",28.0,75%,yes
+Eclo_VC_28100,2,contig_2,2937943,2897690,40258,PHAGE_Phage_Gifsy_2_NC_010393,intact(150),"integrase,terminase,portal,head,tail,plate",54.0,87%,yes
+Eclo_VC_28100,3,contig_2,2884775,2839569,45212,PHAGE_Entero_mEp390_NC_019721,intact(150),"integrase,lysin,portal,head,capsid,tail",70.0,98.5%,yes
+Eclo_VC_28100,4,contig_2,2280745,2228497,52254,PHAGE_Entero_mEp237_NC_019704,intact(150),"tail,structural,capsid,head,portal,terminase,recombinase,integrase",63.0,95.2%,yes
+Eclo_VC_28100,5,contig_2,1926274,1871781,54496,PHAGE_Erwini_vB_EhrS_59_NC_048198,intact(150),"flippase,tail,capsid,head,portal,terminase,lysin,integrase",93.0,93.5%,yes
+Eclo_VC_28100,6,contig_2,1859872,1804820,55057,PHAGE_Escher_HK75_NC_016160,intact(150),"tail,head,capsid,portal,integrase",60.0,98.3%,yes
+Kpne_VC_46536,1,contig_3,4602780,4586789,15995,PHAGE_Salmon_118970_sal3_NC_031940,questionable(90),"integrase,capsid,head,portal,terminase",22.0,86.3%,yes
+Kpne_VC_46536,2,contig_3,2105095,2053083,52018,PHAGE_Salmon_SEN34_NC_028699,intact(150),"tail,plate,capsid,head,portal,terminase,lysin,protease,integrase",63.0,95.2%,yes
+Kpne_VC_46536,3,contig_3,2016545,1994820,21727,PHAGE_Escher_HK639_NC_016158,incomplete(50),"transposase,integrase",28.0,92.8%,yes
+Kpne_VC_46536,4,contig_3,1562988,1525502,37489,PHAGE_Klebsi_ST512_KPC3phi13.2_NC_049452,intact(150),"tail,coat,plate,virion,head,terminase,capsid,portal,recombinase",47.0,100%,yes
+Kpne_VC_46536,5,contig_3,1087732,1048214,39528,PHAGE_Erwini_vB_EhrS_59_NC_048198,intact(150),"tail,capsid,head,portal,terminase,transposase,integrase",75.0,96%,yes
+Kpne_VC_46536,6,contig_6,188743,212869,24128,PHAGE_Escher_RCS47_NC_042128,intact(130),"transposase,integrase",25.0,72%,yes

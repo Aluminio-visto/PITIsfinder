@@ -1,0 +1,8 @@
+Sample,Contig,Size,MOB,MPF,Rep,AbR
+Eclo_VC_28100,AA002,65485,MOBP,-,IncL/M(pOXA-48),OXA-48
+Eclo_VC_28100,AA739,306271,MOBH,-,IncHI2;IncHI2A,AAC(3)-IIe;AAC(6')-Ib-cr;AAC(6')-Ib7;ANT(3'')-IIa;APH(3'')-Ib;APH(6)-Id;CTX-M-15;OXA-1;QnrB6;TEM-181;catB3;catI;dfrA14;sul2;tet(A)
+Eclo_VC_28100,AB040,8308,-,-,-,-
+Kpne_VC_46536,AA002,63094,MOBP,-,IncL/M(pOXA-48),OXA-48
+Kpne_VC_46536,AA275,212878,-,-,IncFIB(K);IncFII(K),AAC(6')-Ib7;aadA2;catI;dfrA12;qacEdelta1;sul1
+Kpne_VC_46536,AA552,78891,MOBF,-,IncR,AAC(6')-Ib-cr;AAC(6')-Ib7;AAC(6')-Ib7;APH(3'')-Ib;APH(6)-Id;OXA-1;QnrS1;catB3;dfrA14;mphA;sul2;tet(A)
+Kpne_VC_46536,AA976,7447,MOBQ,-,Col156,-
