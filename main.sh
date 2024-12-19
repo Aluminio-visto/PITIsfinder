@@ -280,8 +280,8 @@ sed -i $'1 i\\\nSample\tReads\(\%\)\tGenus\tReads\(\%\)\tSpecies' 04_taxonomies/
 sed  's/\t[[:blank:]]*/\t/g' 04_taxonomies/kraken_report.csv > kraken.csv
 
 ### QC de Assemblies ###
-sed '1i Samples' samples > samples2
-paste samples2  03_assemblies/quast/transposed_report.tsv | cut -f 1,15-18,27 > QC_assembly.csv
+cut 03_assemblies/quast/transposed_report.tsv -f 1,14-17,26 > QC_assembly.csv
+sed -i 's/Assembly/Samples/' QC_assembly.csv
 
 ### Informe de Abricate ###
 cp 08_Anotacion/AbR.tab AbR_report.csv
