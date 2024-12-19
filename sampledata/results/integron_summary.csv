@@ -1,6 +1,0 @@
-Sample,Pl/Chr,Name,Size,Inicio,Final,Tipo,Integrasa,Cassette 1,Cassette 2,Cassette 3,Cassette 4,Cassette 5,Cassette 6,Cassette 7,Cassette 8,Cassette 9,Cassette 10,Cassette 11,Cassette 12
-Eclo_VC_28100,contig_1,integron_01_contig_1_aadA1_1_NA_Eclo_VC_28100,2470,125976,128446,complete,intersection_tyr_intI,['aadA1_1'],['NA;IS1 family transposase IS1R'],,,,,,,,,,
-Eclo_VC_28100,contig_2,integron_01_contig_2_aadA1_1_emrE_Eclo_VC_28100,5635,4760527,4766162,complete,intersection_tyr_intI,['aadA1_1'],"['emrE;Multidrug transporter EmrE', 'sul1_1', 'NA;hypothetical protein', 'NA;hypothetical protein', 'NA;IS6 family transposase IS6100', 'NA;hypothetical protein']",,,,,,,,,,
-Eclo_VC_28100,contig_2,integron_02_contig_2__Eclo_VC_28100,1013,4766320,4767333,In0,intersection_tyr_intI,,,,,,,,,,,,
-Kpne_VC_46536,contig_6,integron_01_contig_6_dfrA12_1_ant1_1_emrE_Kpne_VC_46536,3361,104195,107556,complete,intersection_tyr_intI,['dfrA12_1'],"[""ant1_1;Streptomycin 3''-adenylyltransferase"", ""ant1_2;Streptomycin 3''-adenylyltransferase""]",['emrE;Multidrug transporter EmrE'],,,,,,,,,
-Kpne_VC_46536,contig_7,integron_01_contig_7__Kpne_VC_46536,794,1,795,In0,intersection_tyr_intI,,,,,,,,,,,,
