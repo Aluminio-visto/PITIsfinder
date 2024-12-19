@@ -11,7 +11,9 @@ The virtual conda environments used are in the environemnts folder.
 
 ## Input
 The working directory must contain the following files and folders/subfolders:
+
 **Sample input, output and intermediate files can be found at: https://zenodo.org/records/14523202**
+
 - fastq_pass/barcode*/*.fastq.gz
 - final_summary_*.txt
 - report_*.json
