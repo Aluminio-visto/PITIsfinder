@@ -8,3 +8,18 @@ You may take a look to the main scripts in Scripts folder and main.sh.
 The virtual conda environments used are in the environemnts folder.
 
 ![image](https://github.com/user-attachments/assets/b36a0998-3af2-44d6-b167-e54369af821c)
+
+## Input
+The working directory must contain the following files and folders/subfolders:
+- fastq_pass/barcode*/*.fastq.gz
+- final_summary_*.txt
+- report_*.json
+- lista_seq.tsv
+- datos_analisis.csv
+- datos_seq.csv
+
+## Output
+
+
+## Execution
+Before the initial execution, make sure all conda environments available at the environments folder are installed and all Databases needed in the pipeline are locally accessible in the specified locations at main.sh.
