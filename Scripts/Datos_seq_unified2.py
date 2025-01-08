@@ -10,12 +10,12 @@ import numpy as np
 # %%
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Script para procesar datos de secuenciación y ensamblaje")
-
+    
     # Argumento obligatorio para 'base_run'
     parser.add_argument("--input_path", type=str, help="Path del run de secuenciación")
 
     # Argumento opcional para 'output_run'
-    parser.add_argument("--output_file", type=str, default="datos_seq_nuevos.csv",
+    parser.add_argument("--output_file", type=str, default="datos_seq_nuevos.csv", 
                         help="Nombre del archivo de salida (opcional, por defecto 'output_results.csv')")
 
     return parser.parse_args()
@@ -52,7 +52,7 @@ def parse_minion_report(report):
         items = re.findall(r'\"total_pores\":\"\d*\"', doc)
         d_report['poros_ini'] = items[0].split(":")[-1].strip("\"")
         d_report['poros_fin'] = items[-1].split(":")[-1].strip("\"")
-
+        
     return d_report
 
 # %%
@@ -138,7 +138,7 @@ def calculate_score(d_info):
 
     # Puntuación con respecto al cromosoma
     # ratio de los dos mayores contigs/total
-    if d_info['ratio_total'] > 0.8:
+    if d_info['ratio_total'] > 0.8: 
         score += 1.5
         d_score['ratio'] = 1.5
     else:
@@ -162,7 +162,7 @@ def calculate_score(d_info):
             d_score['greatest_linked'] = 0.75
         else:
             d_score['greatest_linked'] = 0
-
+    
     # Puntuación con respecto a plásmidos
     plasmid_score = 1.5
     if d_info['n_plas'] > 0:
@@ -191,7 +191,7 @@ def get_assembly_score(lista_cepas, base_run):
             score = 0
             d_score = {}
         d_quality[sample] = score
-
+    
     return d_quality
 
 # %%
@@ -218,12 +218,12 @@ def main():
     # Histórico de datos de análisis
     anali = os.path.join(base_run, "datos_analisis.csv")
 
-    # Información básica del run actual
+    # Información básica del run actual 
     cepas = os.path.join(base_run, "lista_seq.tsv")
 
     # Taxonomy
     taxon = os.path.join(base_run, "taxonomy.csv")
-
+    
     # EGMs
     # Plásmidos
     plasmids = os.path.join(base_run, "copla_modif.csv")
@@ -282,10 +282,10 @@ def main():
 
 
     # Inicializamos la tabla output con las muestras de este run y la información técnica
-    columnas = ["Nº Cultivo", "Cepario", "ID único", "Fecha seq", "Fecha seq (rep)", "Fecha seq (rep2)",
-                "Kit Extracción", "Kit Barcoding", "Barcode", "BC (rep)", "BC (rep2)", "Posición",
-                "Tipo FlowCell", "FlowCell", "Poros inicio", "Poros final", "Horas seq", "Cepas/run",
-                "Cepas a repetir/run", "Rendim (Mbp)", "Repetir", "Tª trabajo", "Voltaje ", "Rend/h (reads)",
+    columnas = ["Nº Cultivo", "Cepario", "ID único", "Fecha seq", "Fecha seq (rep)", "Fecha seq (rep2)", 
+                "Kit Extracción", "Kit Barcoding", "Barcode", "BC (rep)", "BC (rep2)", "Posición", 
+                "Tipo FlowCell", "FlowCell", "Poros inicio", "Poros final", "Horas seq", "Cepas/run", 
+                "Cepas a repetir/run", "Rendim (Mbp)", "Repetir", "Tª trabajo", "Voltaje ", "Rend/h (reads)", 
                 "Rend/h (MbP)", "N50 (kbp)"]
     df = pd.DataFrame(columns=columnas)
     result = pd.concat([df, lista_cepas])
@@ -305,15 +305,15 @@ def main():
     # %%
     # Poblar con datos de QC_reads.csv
     QC_reads = QC_reads.rename(columns={"Sample":"ID único",
-                            "Median length" : "Lmediana (pre)",
-                            "Median quality" : "Qmediana (pre)",
-                            "Total reads" : "Nreads (pre)",
+                            "Median length" : "Lmediana (pre)", 
+                            "Median quality" : "Qmediana (pre)", 
+                            "Total reads" : "Nreads (pre)", 
                             "Total bases" : "Nbases (pre)",
-                            "Median length.1" : "Lmediana (post)",
-                            "Median quality.1" :"Qmediana (post)",
+                            "Median length.1" : "Lmediana (post)", 
+                            "Median quality.1" :"Qmediana (post)", 
                             "Total reads.1" : "Nreads (post)",
                             "Total bases.1" : "Nbases (post)"})
-
+                            
     QC_reads = QC_reads.drop(columns=["MaxQ", "Longest read", "Sample.1", "MaxQ.1", "Longest read.1"])
     QC_reads[["Nbases (post)"]].apply(pd.to_numeric)
     result2 = pd.merge(result, QC_reads, on="ID único", how='outer')
@@ -321,7 +321,7 @@ def main():
     # Poblar con datos de QC_assembly.csv
     QC_assembly = QC_assembly.rename(columns={"Samples":"ID único"})
     QC_assembly["ratio"] = QC_assembly["Largest contig"]/QC_assembly["Total length"]
-    QC_assembly = QC_assembly.drop(columns=["GC (%)",   "# predicted genes (>= 300 bp)"], errors='ignore')
+    QC_assembly = QC_assembly.drop(columns=["GC (%)",	"# predicted genes (>= 300 bp)"], errors='ignore')
 
     result3 = pd.merge(result2, QC_assembly, on="ID único", how='outer')
 
@@ -331,14 +331,14 @@ def main():
     result3["Profundidad"] = result3["Profundidad"].round(0).astype('Int64')
 
     result3["% Bases Filtrado"] = result3["Nbases (post)"].div(result3["Nbases (pre)"])
-
+    
     # Añadir score del assembly
-    result3['Calidad (ass,)'] = result3['ID único'].map(d_quality)
+    result3['Calidad (ass.)'] = result3['ID único'].map(d_quality)
 
     orden_final = ["Nº Cultivo", "Cepario","ID único", "Barcode", "BC (rep)", "BC (rep2)", "Fecha seq", "Fecha seq (rep)", "Fecha seq (rep2)", "[DNA]",
-            "Profundidad", 'Calidad (ass,)', "Kit Extracción", "Kit Barcoding", "Posición", "Tipo FlowCell",
-            "FlowCell", "Poros inicio", "Poros final", "Horas seq", "Cepas/run", "Cepas a repetir/run",
-            "Lmediana (pre)", "Qmediana (pre)", "Nreads (pre)", "Nbases (pre)",
+            "Profundidad", 'Calidad (ass.)', "Kit Extracción", "Kit Barcoding", "Posición", "Tipo FlowCell", 
+            "FlowCell", "Poros inicio", "Poros final", "Horas seq", "Cepas/run", "Cepas a repetir/run", 
+            "Lmediana (pre)", "Qmediana (pre)", "Nreads (pre)", "Nbases (pre)",          
             "Lmediana (post)", "Qmediana (post)", "Nreads (post)", "Nbases (post)", "% Bases Filtrado"]
     result3 = result3[orden_final]
 
@@ -346,7 +346,7 @@ def main():
     Ncepas_inicial = lista_cepas.shape[0]
     Ncepas_bien = (result3["Profundidad"] > 30.0).sum()
     Ncepas_repetir = Ncepas_inicial - Ncepas_bien
-
+    
     result3["Cepas/run"]           = Ncepas_inicial
     result3["Cepas a repetir/run"] = Ncepas_repetir
 
@@ -355,7 +355,7 @@ def main():
 
     # Realiza el merge para unir las tablas basado en 'ID único'
     merged_df = pd.merge(datos_seq, result3, on='ID único', how='left', suffixes=('', '_result3'))
-
+    
     # Verifica y asigna los valores de "Fecha seq (rep2)" y "BC (rep2)"
     merged_df['Fecha seq (rep2)'] = merged_df['Fecha seq (rep2)'].combine_first(
         merged_df.apply(lambda x: x['Fecha seq_result3'] if pd.notna(x['Fecha seq (rep)']) else None, axis=1))
@@ -406,11 +406,13 @@ def main():
     result4['Plásmidos'] = result4['ID único'].map(pl_count, na_action='ignore')
 
     # ICEs
-    # ices = os.path.join(base_run, "ICE_summary.csv")
-    # df_ices = pd.read_csv(ices, sep=',')
-    # ice_count = df_ices['Nombre muestra'].value_counts()
-    # result4['ICEs'] = result4['ID único'].map(ice_count, na_action='ignore')
-    result4["ICEs"] = '0'
+    ices = os.path.join(base_run, "ICE_summary.csv")
+    try:
+        df_ices = pd.read_csv(ices, sep=',')
+        ice_count = df_ices['Nombre muestra'].value_counts()
+        result4['ICEs'] = result4['ID único'].map(ice_count, na_action='ignore')
+    except:
+        result4['ICEs'] = ""
 
     # Fagos
     fagos = os.path.join(base_run, "phage_summary.csv")
@@ -426,13 +428,13 @@ def main():
 
     result4[['Plásmidos', 'ICEs', 'Profagos', 'Integrones']] = result4[['Plásmidos', 'ICEs', 'Profagos', 'Integrones']].fillna(0)
 
-    result4 = result4.merge(merged_df[['ID único', 'Calidad (ass,)', 'Profundidad']], on='ID único', how='inner')
+    result4 = result4.merge(merged_df[['ID único', 'Calidad (ass.)', 'Profundidad']], on='ID único', how='inner')
 
-    nwo = ["Nº Cultivo", "ID único", "Barcode",  "Profundidad", 'Calidad (ass,)', "Género mayoritario", "Especie mayoritaria",
-       "Subespecie", "MLST", "Serotype", "K/O locus", "Posibles contaminantes", "Carba adquirida",
-       "BLEE adquirida", "Otras", "Nº genes AMR", "AMRscore", "VIRscore",
-       "Plásmidos", "ICEs", "Profagos", "Integrones", "Esquema MLST",
-       "alelo #1",      "alelo #2",     "alelo #3",     "alelo #4",     "alelo #5",     "alelo #6",     "alelo #7",
+    nwo = ["Nº Cultivo", "ID único", "Barcode",  "Profundidad", 'Calidad (ass.)', "Género mayoritario", "Especie mayoritaria",	
+       "Subespecie", "MLST", "Serotype", "K/O locus", "Posibles contaminantes",	"Carba adquirida",	
+       "BLEE adquirida", "Otras", "Nº genes AMR", "AMRscore", "VIRscore", 
+       "Plásmidos", "ICEs", "Profagos", "Integrones", "Esquema MLST",	
+       "alelo #1",	"alelo #2",	"alelo #3",	"alelo #4",	"alelo #5",	"alelo #6",	"alelo #7",	
        "MLSTs posibles", "Alelos posibles"]
     result4=result4[nwo]
     analisis=analisis[nwo]
