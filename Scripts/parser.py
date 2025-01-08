@@ -2,10 +2,9 @@
 
 #############################################################
 # Jorge R Grande - HUMV - Santander
-# parser.py takes in a folder containing the output of main.sh
+# parser.py takes in a folder containing the output of minion.sh
 # and outputs a short report summarizing stats from the MinION run
-# including, QC of reads and assemblies, resistance genes, 
-# taxonomy (MLST, alleles, K/O types) and plasmids.
+# including, QC of reads and assemblies, resistance genes, MLST and plasmids. 
 
 
 
@@ -62,7 +61,7 @@ genus_report        = input_folder + "/04_taxonomies/kraken2/genus.csv"
 
 gambit_report       = input_folder + "/04_taxonomies/gambit.csv"
 
-kleb_report         = input_folder + "/klebsiellas/enterobacterales__species_output.txt"
+kleb_report         = input_folder + "/04_taxonomies/kleborate/enterobacterales__species_output.txt"
 
 ec                  = input_folder + "/04_taxonomies/ectyper/output.tsv"
 
@@ -107,7 +106,7 @@ with open(report_2, 'w') as f:
 
 with open(report, 'r') as file:
     for line in file:                                                       # iterar sobre cada muestra:
-        column = line.strip('\n').strip().split('\t')                       # eliminar saltos de línea y espacios
+        column = line.strip('\n').strip().split('\t')                       # eliminar saltos de línea y espacios 
 
 
         organismo = column[1]                                               # el mlst.csv indica en la 2ºcol.qué organismo cree que está analizando
@@ -118,11 +117,11 @@ with open(report, 'r') as file:
         if (column[1] == '-'):                                              # Si no hay un modelo de MLST escribe la línea de muestra y el error
             column[1] = 'No tiene esquema asociado'
             with open(report_2, 'a') as f:
-                f.write('\t'.join(map(str, column)) +'\n')
+                f.write('\t'.join(map(str, column)) +'\n')            
 
         elif (column[1] != '-') and (column[2] != '-'):                     # Si tiene ya MLST escríbela tal cual
             with open(report_2, 'a') as f:
-                f.write('\t'.join(map(str, column)) +'\n')
+                f.write('\t'.join(map(str, column)) +'\n')          
 
         elif (column[1] != '-') and (column[2] == '-'):                     # Pero si los ST son indefinidos pero de especie conocida
             genes   = [col.split('(')[0] for col in column[3:]]             # saca la lista provisional de genes de cada muestra, puede incluir genes mal tipados
@@ -131,18 +130,18 @@ with open(report, 'r') as file:
             diccion = dict(zip(genes, numeros))                             # genero un diccionario gen:alelo con ellos
 
             diccion = {k: v for k, v in diccion.items() if v.isdigit()}     # toma solo los alelos seguros (quita los (?) y (~))
-
+           
             mlst    = pd.DataFrame([diccion])                               # genero un dataframe con el diccionario
             mlst    = mlst.astype('int64')                                  # convierte los alelos a nº entero
 
             df       = pd.read_csv(db_org, sep = '\t')                      # abro como dataframe la DB de pubMLST
 
             genes    = list(diccion.keys())                                 # saca una lista de los genes seguros de la muestra
-
+            
             if len(genes) == 0:
                 print('No hay ningún alelo bien secuenciado')
                 posibles = pd.DataFrame([{'ST': []}])
-
+            
             else:
                 posibles = pd.merge(mlst, df, how='left', on=genes)         # mergea la DB de pubMLST con el dataframe de alelos seguros de la muestra
 
@@ -151,7 +150,7 @@ with open(report, 'r') as file:
 
                 posibles_alelos = posibles.iloc[:,posibles.columns.get_indexer(['ST'])]
 
-
+                
             else:
                 posibles_alelos = posibles.iloc[:,posibles.columns.get_indexer(['ST'])+1] # aquí me daba el error "positional indexers are out of bounds"
 
@@ -160,13 +159,13 @@ with open(report, 'r') as file:
             for k, v in posibles_alelos.items():
                 #v = ['' if pd.isna(x) else x for x in v]
                 v = ['Ningún alelo de este gen coincide con esta combinación' if pd.isna(x) else x for x in v]
-                posibles_alelos[k] = v[:9]
+                posibles_alelos[k] = v[:9]                    
 
             posibles.fillna('Posible nuevo ST', inplace=True)
             posibles_ST     = posibles.ST.to_list()                         # saca una lista de los posibles ST
 
             if (len(column) <= 9):
-                column.append(str(''))
+                column.append(str(''))     
 
             posibles_ST = posibles_ST[:9]
             print(posibles_alelos)
@@ -189,7 +188,7 @@ df_abricate = pd.read_csv(abricate, sep='\t')
 
 for col in df_abricate.columns[2:]:
 
-
+    
     df_abricate[col] = df_abricate[col].apply(lambda x: col + ' (' + str(x) +')' if x != '.' else '')
 
 
@@ -237,7 +236,7 @@ with open(copla_in, 'r') as f:
                 if line.split(':')[1].strip() != '':
                      d['Contig'].append(line.split(':')[1].strip())
                 else:
-                     d['Sample'].append('-')
+                     d['Sample'].append('-')              
         if line.startswith('Size'):
                 print(line)
                 if line.split(':')[1].strip() != '':
@@ -296,15 +295,15 @@ genus['Sample']   = genus['Sample'].astype(str)
 gambit   = pd.read_csv(gambit_report)
 
 kleborate= pd.read_csv(kleb_report, sep='\t', usecols=['strain','enterobacterales__species__species','klebsiella_pneumo_complex__kaptive__K_locus',
-                                                        'klebsiella_pneumo_complex__kaptive__K_locus_confidence',
-                                                        'klebsiella_pneumo_complex__kaptive__O_locus',
-                                                        'klebsiella_pneumo_complex__kaptive__O_locus_confidence',
-                                                        'klebsiella_pneumo_complex__amr__Bla_acquired',
-                                                        'klebsiella_pneumo_complex__amr__Bla_ESBL_acquired',
-                                                        'klebsiella_pneumo_complex__amr__Bla_Carb_acquired',
-                                                        'klebsiella_pneumo_complex__virulence_score__virulence_score',
-                                                        'klebsiella_pneumo_complex__resistance_score__resistance_score',
-                                                        'klebsiella_pneumo_complex__resistance_gene_count__num_resistance_genes'])
+							'klebsiella_pneumo_complex__kaptive__K_locus_confidence',
+							'klebsiella_pneumo_complex__kaptive__O_locus',
+							'klebsiella_pneumo_complex__kaptive__O_locus_confidence',
+							'klebsiella_pneumo_complex__amr__Bla_acquired',
+							'klebsiella_pneumo_complex__amr__Bla_ESBL_acquired',
+							'klebsiella_pneumo_complex__amr__Bla_Carb_acquired',
+							'klebsiella_pneumo_complex__virulence_score__virulence_score',
+							'klebsiella_pneumo_complex__resistance_score__resistance_score',
+							'klebsiella_pneumo_complex__resistance_gene_count__num_resistance_genes'])
 kleborate['strain'] = kleborate['strain'].astype(str)
 kleborate.fillna('', inplace=True)
 gambit = gambit[['query','closest.description']]
@@ -348,24 +347,24 @@ kleborate['klebsiella_pneumo_complex__amr__Bla_Carb_acquired'] = kleborate['kleb
 kleborate['klebsiella_pneumo_complex__amr__Bla_Carb_acquired'] = kleborate['klebsiella_pneumo_complex__amr__Bla_Carb_acquired'].str.split(';')
 kleborate['klebsiella_pneumo_complex__amr__Bla_Carb_acquired'] = kleborate['klebsiella_pneumo_complex__amr__Bla_Carb_acquired'].apply(set).apply(list).apply(lambda x: ', '.join(map(str, x)))
 
-kleborate['klebsiella_pneumo_complex__kaptive__K_locus']    = kleborate['klebsiella_pneumo_complex__kaptive__K_locus'].str.replace(r'unknown \([A-Z]*[0-9]*\-*[A-Z]*[0-9]*\)', '-', regex=True)
+kleborate['klebsiella_pneumo_complex__kaptive__K_locus']    = kleborate['klebsiella_pneumo_complex__kaptive__K_locus'].str.replace(r'unknown \([A-Z]*[0-9]*\-*[A-Z]*[0-9]*\)', '-', regex=True)  
 kleborate['klebsiella_pneumo_complex__kaptive__O_locus']    = kleborate['klebsiella_pneumo_complex__kaptive__O_locus'].str.replace(r'unknown \([A-Z]*[0-9]*\/*[A-Z]*[0-9]*[av]*[0-9]*\)', '-', regex=True)
 kleborate['K/O locus']  = kleborate['klebsiella_pneumo_complex__kaptive__K_locus']            + '/' + kleborate['klebsiella_pneumo_complex__kaptive__O_locus']
 
 kleborate.drop(['klebsiella_pneumo_complex__kaptive__K_locus_confidence','klebsiella_pneumo_complex__kaptive__O_locus_confidence','klebsiella_pneumo_complex__kaptive__O_locus','enterobacterales__species__species'], axis = 1, inplace=True)
 kleborate = kleborate.rename(columns={'strain':'Sample',
-                                        'klebsiella_pneumo_complex__amr__Bla_acquired':'Otras',
-                                        'klebsiella_pneumo_complex__amr__Bla_ESBL_acquired':'BLEE adquirida',
-                                        'klebsiella_pneumo_complex__amr__Bla_Carb_acquired':'Carba adquirida',
-                                        'klebsiella_pneumo_complex__virulence_score__virulence_score':'VIRscore',
-                                        'klebsiella_pneumo_complex__resistance_score__resistance_score':'AMRscore',
-                                        'klebsiella_pneumo_complex__resistance_gene_count__num_resistance_genes':'Nº genes AMR'})
+					'klebsiella_pneumo_complex__amr__Bla_acquired':'Otras',
+					'klebsiella_pneumo_complex__amr__Bla_ESBL_acquired':'BLEE adquirida',
+					'klebsiella_pneumo_complex__amr__Bla_Carb_acquired':'Carba adquirida',
+					'klebsiella_pneumo_complex__virulence_score__virulence_score':'VIRscore',
+					'klebsiella_pneumo_complex__resistance_score__resistance_score':'AMRscore',
+					'klebsiella_pneumo_complex__resistance_gene_count__num_resistance_genes':'Nº genes AMR'})
 
 kleborate = kleborate[['Sample', 'K/O locus','Carba adquirida','BLEE adquirida','Otras', 'Nº genes AMR','AMRscore','VIRscore']]
 
 resultado = pd.merge(intermedio, kleborate, how="left", on='Sample')
 
-#
+# 
 
 ectyper  = pd.read_csv(ec, sep='\t', usecols=['Name','Serotype'])
 ectyper  = ectyper.rename(columns={'Name':'Sample'})
