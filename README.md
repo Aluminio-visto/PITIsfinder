@@ -21,6 +21,15 @@ The working directory must contain the following files and folders/subfolders:
 - datos_analisis.csv
 - datos_seq.csv
 
+The workflow also uses the following databases. Make sure they are locally available and properly indicated in the code when executing the pipeline:
+
+- [Bakta DB](https://github.com/oschwengers/bakta)
+- [Megares DB](https://www.meglab.org/megares/)
+- [IS Finder DB](https://github.com/thanhleviet/ISfinder-sequences)
+- [Kraken2 DB](https://benlangmead.github.io/aws-indexes/k2)
+- [Gambit DB](https://github.com/jlumpe/gambit)
+
+
 ## Output
 **Sample input, output and intermediate files can be found at: https://zenodo.org/records/14523202**
 ```
