@@ -447,7 +447,7 @@ def main():
     analisis['Barcode'] = analisis['Barcode'].replace('nan', np.nan)
 
     # Realiza el merge para unir las tablas basado en 'ID único'
-    analisis_final = pd.merge(analisis, result4, on='ID único', how='left', suffixes=('', '_result4'))
+    analisis_final = pd.merge(analisis, result4, on='ID único', how='outer', suffixes=('', '_result4'))
 
     for column in analisis.columns:
         if column != 'ID único':  # Evitar la columna de unión
