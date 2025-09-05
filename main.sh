@@ -59,15 +59,18 @@ done
 # 2.2 Desconcatenación de multímeros
 for i in $(cat samples); do
     echo $i;
-    python3 ../Scripts/deconcat/deconcat.py --fasta_file 03_assemblies/${i}/assembly.fasta --fastq_file 02_filter/$i.fastq.gz --out_path 03_assemblies/$i/deconcat;
+    python3 ../PITIsfinder/Scripts/deconcat/deconcat.py --fasta_file 03_assemblies/${i}/assembly.fasta --fastq_file 02_filter/$i.fastq.gz --out_path 03_assemblies/$i/deconcat;
     cp 03_assemblies/${i}/deconcat/assembly_corr.fasta 03_assemblies/${i}.fasta
 done > 03_assemblies/deconcat.log
 
 # 2.3 Pulir assemblies
 for i in $(cat samples); do
-    medaka_consensus -b 4 -i 02_filter/${i}.fastq.gz -d 03_assemblies/${i}.fasta -o 03_assemblies/${i}/medaka  -m r941_e81_sup_g514 -t 30
-    mv 03_assemblies/${i}/medaka/consensus.fasta 03_assemblies/${i}.fasta
-    rm -r 03_assemblies/${i}/medaka/
+    dorado aligner --add-fastq-rg --output-dir 03_assemblies/$i/dorado_polish/ 03_assemblies/$i.fasta 02_filter/$i.fastq.gz
+    samtools addreplacerg -r "@RG\tID:A\tDS:basecall_model=`gzip -cd 02_filter/$i.fastq.gz | head -n 1 | awk -F 'basecall_model_version_id=' '{print $2}'`" 03_assemblies/$i/dorado_polish/$i.bam -o 03_assemblies/$i/dorado_polish/$i.RG.bam -O bam
+    rm 03_assemblies/$i/dorado_polish/$i.bam 03_assemblies/$i/dorado_polish/$i.bam.bai
+    samtools index 03_assemblies/$i/dorado_polish/$i.RG.bam
+    dorado polish --batchsize 8 03_assemblies/$i/dorado_polish/$i.RG.bam 03_assemblies/$i.fasta -o 03_assemblies/$i/dorado_polish/
+    cp 03_assemblies/$i/dorado_polish/consensus.fasta 03_assemblies/$i.fasta
 done
 
 # 2.4 Recircularizar
@@ -145,9 +148,10 @@ conda activate pitis_egm
 
 # 5.1 Plásmidos
 # 5.1.1 mob_recon (detección de plásmidos)
+# docker pull quay.io/biocontainers/mob_suite:3.1.9--pyhdfd78af_1
 for i in $(cat samples); do
     # docker run --rm -v $(pwd):/mnt/ "kbessonov/mob_suite:3.0.3" mob_recon -i /mnt/03_assemblies/${i}.fasta -o /mnt/08_Anotacion/${i}/mob_recon -c --force -t -n 30;
-    docker run --rm -u $(id -u):$(id -g) -v $(pwd):/mnt/ mob_suite:3.1.9 mob_recon -i /mnt/03_assemblies/${i}.fasta -o /mnt/08_Anotacion/${i}/mob_recon -c --force -n 30;
+    docker run --rm -u $(id -u):$(id -g) -v $(pwd):/mnt/ quay.io/biocontainers/mob_suite:3.1.9--pyhdfd78af_1 mob_recon -i /mnt/03_assemblies/${i}.fasta -o /mnt/08_Anotacion/${i}/mob_recon -c --force -n 30;
 done  # Tipado de Plásmidos
 
 # 5.1.2 Copla (Asignar PTU)
@@ -164,7 +168,7 @@ done
 for i in $(cat samples); do
     integron_finder 03_assemblies/${i}.fasta --cpu 30 --outdir 11_integrons/${i} --func-annot --gbk;
 done
-python3 ../Scripts/integrones/integron_parser.py .
+python3 ../PITIsfinder/Scripts/integrones/integron_parser.py .
 cp 11_integrons/integron_summary.csv .
 
 # 5.3 Fagos
@@ -178,7 +182,7 @@ for i in $(cat samples); do
     rm -r $phastest_path/phastest_inputs/"$i".fasta;
 done
 
-python3 ../Scripts/phages/phage_parser.py .
+python3 ../PITIsfinder/Scripts/phages/phage_parser.py .
 cp 09_phages/phage_summary.csv .
 
 # 5.4 IS
@@ -186,7 +190,7 @@ for i in $(cat samples) ; do
     sed -i 's/>contig/>Chr/g' 08_Anotacion/${i}/mob_recon/chromosome.fasta &&
     makeblastdb -in 08_Anotacion/${i}/mob_recon/chromosome.fasta -dbtype nucl &&
     blastn -db  08_Anotacion/${i}/mob_recon/chromosome.fasta -query $isfinder_db -outfmt "6 qseqid sseqid sstart send pident mismatch evalue" | sort -k 3 > 08_Anotacion/${i}/IS_chr.tsv &&
-    python3 ../Scripts/IS_parser.py -i 08_Anotacion/${i};
+    python3 ../PITIsfinder/Scripts/IS_parser.py -i 08_Anotacion/${i};
 done
 
 conda deactivate
@@ -239,7 +243,7 @@ sed -i 's/Assembly/Samples/' QC_assembly.csv
 cp 08_Anotacion/AbR.tab AbR_report.csv
 
 # 6.5 Resto del informe
-python3 ../Scripts/parser.py -i .
+python3 ../PITIsfinder/Scripts/parser.py -i .
 
 # 6.6 Informe IS
 for i in $(cat samples); do cat 08_Anotacion/${i}/IS_chr_out.tsv | cut -f 2 | sort | uniq -c | sort -r | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]/\t&/g'  >08_Anotacion/${i}/N_IS_${i}.tsv; done &&
@@ -249,7 +253,7 @@ sed  -i '1i sample      max     IS_name Total_IS' IS.tsv &&
 rm max_IS.tsv 08_Anotacion/total_N_IS.tsv 08_Anotacion/max_N_IS.tsv
 
 # Python para la generación de datos_seq_nuevos.csv y datos_analisis_nuevos.csv
-python3 ../Scripts/Datos_seq_unified2.py --input_path .
+python3 ../PITIsfinder/Scripts/Datos_seq_unified2.py --input_path .
 
 ###############
 # Repositorio #
@@ -273,7 +277,7 @@ done
 for i in $(cat samples); do
     rm -r ../repositorio/05_plasmids/*"$i"*
 done
-cp 05_plasmids/ ../repositorio/05_plasmids
+cp -r 05_plasmids/ ../repositorio/05_plasmids
 
 # Integrones
 for i in $(cat samples); do
