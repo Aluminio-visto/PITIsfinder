@@ -333,10 +333,10 @@ def main():
     result3["% Bases Filtrado"] = result3["Nbases (post)"].div(result3["Nbases (pre)"])
     
     # Añadir score del assembly
-    result3['Calidad (ass.)'] = result3['ID único'].map(d_quality)
+    result3['Calidad (ass)'] = result3['ID único'].map(d_quality)
 
     orden_final = ["Nº Cultivo", "Cepario","ID único", "Barcode", "BC (rep)", "BC (rep2)", "Fecha seq", "Fecha seq (rep)", "Fecha seq (rep2)", "[DNA]",
-            "Profundidad", 'Calidad (ass.)', "Kit Extracción", "Kit Barcoding", "Posición", "Tipo FlowCell", 
+            "Profundidad", 'Calidad (ass)', "Kit Extracción", "Kit Barcoding", "Posición", "Tipo FlowCell", 
             "FlowCell", "Poros inicio", "Poros final", "Horas seq", "Cepas/run", "Cepas a repetir/run", 
             "Lmediana (pre)", "Qmediana (pre)", "Nreads (pre)", "Nbases (pre)",          
             "Lmediana (post)", "Qmediana (post)", "Nreads (post)", "Nbases (post)", "% Bases Filtrado"]
@@ -428,9 +428,9 @@ def main():
 
     result4[['Plásmidos', 'ICEs', 'Profagos', 'Integrones']] = result4[['Plásmidos', 'ICEs', 'Profagos', 'Integrones']].fillna(0)
 
-    result4 = result4.merge(merged_df[['ID único', 'Calidad (ass.)', 'Profundidad']], on='ID único', how='inner')
+    result4 = result4.merge(merged_df[['ID único', 'Calidad (ass)', 'Profundidad']], on='ID único', how='inner')
 
-    nwo = ["Nº Cultivo", "ID único", "Barcode",  "Profundidad", 'Calidad (ass.)', "Género mayoritario", "Especie mayoritaria",	
+    nwo = ["Nº Cultivo", "ID único", "Barcode",  "Profundidad", 'Calidad (ass)', "Género mayoritario", "Especie mayoritaria",	
        "Subespecie", "MLST", "Serotype", "K/O locus", "Posibles contaminantes",	"Carba adquirida",	
        "BLEE adquirida", "Otras", "Nº genes AMR", "AMRscore", "VIRscore", 
        "Plásmidos", "ICEs", "Profagos", "Integrones", "Esquema MLST",	
