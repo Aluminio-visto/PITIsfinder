@@ -59,7 +59,7 @@ done
 # 2.2 Desconcatenación de multímeros
 for i in $(cat samples); do
     echo $i;
-    python3 ../PITIsfinder/Scripts/deconcat/deconcat.py --fasta_file 03_assemblies/${i}/assembly.fasta --fastq_file 02_filter/$i.fastq.gz --out_path 03_assemblies/$i/deconcat;
+    python3 ../PITIsfinder/Scripts/deconcat/bin/deconcat.py --fasta_file 03_assemblies/${i}/assembly.fasta --fastq_file 02_filter/$i.fastq.gz --out_path 03_assemblies/$i/deconcat;
     cp 03_assemblies/${i}/deconcat/assembly_corr.fasta 03_assemblies/${i}.fasta
 done > 03_assemblies/deconcat.log
 
