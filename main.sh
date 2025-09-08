@@ -1,9 +1,38 @@
 ### 0. Inicializar carpetas y variables.
 
+# Asegurarse de que la carpeta de trabajo tiene la carpeta fastq_pass y los archivos final_summary_*.txt, report_*.json datos_analisis.csv y datos_seq.csv
+
+# Renombrar reads, concatenar con reads antiguos y guardar los concatenados en el repositorio:
+rename_fastqs2() {
+    mkdir 01_reads
+    echo ID$'\t'R1$'\t'R2$'\t'LongFastQ$'\t'Fast5$'\t'GenomeSize$'\t'Fasta > samplesheet.tsv 
+    tail -n +2 lista_seq.tsv | while read -r cult cep id bc c rep; do
+    echo $id $bc $rep
+    # Si no es repetido
+    if [ "$rep" == "y" ]; then
+	echo "Está repetido";
+        # Concatenar
+        cat ../repositorio/01_reads/$id".fastq.gz" fastq_pass/barcode$bc/*.fastq.gz > 01_reads/$id.fastq.gz;
+        # Actualizar repo
+        cp 01_reads/$id.fastq.gz ../repositorio/01_reads/$id".fastq.gz"
+    else
+        echo "No repetido, no concateno"
+	# Renombrar
+        cat fastq_pass/barcode$bc/*.fastq.gz > 01_reads/"$id".fastq.gz;
+        # Actualizar repo
+        cp 01_reads/"$id".fastq.gz ../repositorio/01_reads/$id".fastq.gz";
+    fi
+    echo $id$'\t'$'\t'$'\t'$PWD/01_reads/$id.fastq.gz$'\t'$'\t' >> samplesheet.tsv;
+    done
+    cut -f3 lista_seq.tsv | tail -n+2 > ../repositorio/samples
+}
+
+rename_fastqs2
+
 # 0.1 Crear carpetas
 mkdir 01_reads 02_filter 03_assemblies 04_taxonomies 05_plasmids 08_Anotacion 09_phages 10_ices 11_integrons
 
-# 0.2 Meter en la lista de samples sólo los que hayan salido bien o medio bien (10Mb)
+# 0.2 Meter en la lista de samples sólo los que hayan salido bien o medio bien (150Mb)
 find  01_reads -size +150M | cut -d '/' -f 2 | cut -d '.' -f 1 |  sort -f | uniq > samples
 
 # 0.3 Definir el path de las DB a usar
@@ -65,12 +94,28 @@ done > 03_assemblies/deconcat.log
 
 # 2.3 Pulir assemblies
 for i in $(cat samples); do
-    dorado aligner --add-fastq-rg --output-dir 03_assemblies/$i/dorado_polish/ 03_assemblies/$i.fasta 02_filter/$i.fastq.gz
-    samtools addreplacerg -r "@RG\tID:A\tDS:basecall_model=`gzip -cd 02_filter/$i.fastq.gz | head -n 1 | awk -F 'basecall_model_version_id=' '{print $2}'`" 03_assemblies/$i/dorado_polish/$i.bam -o 03_assemblies/$i/dorado_polish/$i.RG.bam -O bam
-    rm 03_assemblies/$i/dorado_polish/$i.bam 03_assemblies/$i/dorado_polish/$i.bam.bai
-    samtools index 03_assemblies/$i/dorado_polish/$i.RG.bam
-    dorado polish --batchsize 8 03_assemblies/$i/dorado_polish/$i.RG.bam 03_assemblies/$i.fasta -o 03_assemblies/$i/dorado_polish/
-    cp 03_assemblies/$i/dorado_polish/consensus.fasta 03_assemblies/$i.fasta
+    fq="02_filter/$i.fastq.gz"
+    asm="03_assemblies/${i}/deconcat/assembly_corr.fasta"
+    outdir=03_assemblies/$i/dorado_polish
+
+    # read the first header line (robust)
+    header=$(gzip -cd -- "$fq" | sed -n '1p' || true)
+
+    # If FASTQ header contains RG:Z:, run dorado with --add-fastq-rg
+    if printf '%s\n' "$header" | grep -q 'RG:Z:'; then
+        echo "$i contains RG:Z: tag"
+        dorado aligner --add-fastq-rg --output-dir "$outdir" "$asm" "$fq"
+        bam=$outdir/$i.bam
+    else
+        echo "$i does NOT contain RG:Z: tag"
+        dorado aligner --output-dir "$outdir" "$asm" "$fq"
+        samtools addreplacerg -r "@RG\tID:A\tDS:basecall_model=`gzip -cd "$fq" | head -n 1 | awk -F 'basecall_model_version_id=' '{print $2}'`" $outdir/$i.bam -o $outdir/$i.RG.bam -O bam
+        rm $outdir/$i.bam $outdir/$i.bam.bai
+        bam=$outdir/$i.RG.bam
+    fi
+    samtools index $bam
+    dorado polish --batchsize 6 $bam $asm -o $outdir
+    cp $outdir/consensus.fasta 03_assemblies/$i.fasta
 done
 
 # 2.4 Recircularizar
