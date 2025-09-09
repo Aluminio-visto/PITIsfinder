@@ -322,7 +322,7 @@ done
 for i in $(cat samples); do
     rm -r ../repositorio/05_plasmids/*"$i"*
 done
-cp -r 05_plasmids/ ../repositorio/05_plasmids
+cp -r 05_plasmids/* ../repositorio/05_plasmids
 
 # Integrones
 for i in $(cat samples); do
@@ -334,4 +334,4 @@ done
 for i in $(cat samples); do
     rm -r ../repositorio/09_phages/*"$i"*
 done
-cp -r 09_phages/ ../repositorio/09_phages/
+cp -r 09_phages/* ../repositorio/09_phages/
