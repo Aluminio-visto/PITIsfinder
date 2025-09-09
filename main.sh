@@ -105,7 +105,11 @@ for i in $(cat samples); do
     if printf '%s\n' "$header" | grep -q 'RG:Z:'; then
         echo "$i contains RG:Z: tag"
         dorado aligner --add-fastq-rg --output-dir "$outdir" "$asm" "$fq"
-        bam=$outdir/$i.bam
+		model=$(zcat $fq | head -n1 | grep -o 'dna_[^[:space:]]*' | rev | cut -f3- -d'_' | rev)
+  		rg=$(zcat $fq | head -n1 | cut -f3 | cut -f3 -d':')
+		samtools addreplacerg -w -r "@RG\tID:${rg}\tDS:basecall_model=${model}" -o $outdir/$i.RG.bam -O bam $outdir/$i.bam
+ 		rm $outdir/$i.bam $outdir/$i.bam.bai
+        bam=$outdir/$i.RG.bam
     else
         echo "$i does NOT contain RG:Z: tag"
         dorado aligner --output-dir "$outdir" "$asm" "$fq"
