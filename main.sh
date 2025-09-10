@@ -42,12 +42,15 @@ if [ "$ordenador" == "r" ]; then
     bakta_db="/media/usuario/datos/Databases/bakta_light_5_1/db-light/"
     megares="/media/usuario/datos/Databases/megares_v3.00/megares_drugs_database_v3.00.fasta"
     isfinder_db="/media/usuario/datos/Databases/ISfinder/ISfinder-nucl.fasta"
+	dorado_cmd="/home/usuario/Programs/dorado-1.1.1-linux-x64/bin/dorado"
+	conda activate nano2
 else
     kraken_db="/home/usuario/Databases/Kraken"
     gambit_db="/home/usuario/Databases/gambit/"
     bakta_db="/home/usuario/Databases/bakta/db/"
     megares="/home/usuario/Databases/megares/sequences"
     isfinder_db="/home/usuario/Databases/ISfinder/ISfinder-nucl.fasta"
+	dorado_cmd="dorado"
 fi
 phastest_path="/home/usuario/Programs/phastest-docker/"
 
@@ -90,6 +93,7 @@ for i in $(cat samples); do
     echo $i;
     python3 ../PITIsfinder/Scripts/deconcat/bin/deconcat.py --fasta_file 03_assemblies/${i}/assembly.fasta --fastq_file 02_filter/$i.fastq.gz --out_path 03_assemblies/$i/deconcat;
     cp 03_assemblies/${i}/deconcat/assembly_corr.fasta 03_assemblies/${i}.fasta
+	rm -r 03_assemblies/${i}/deconcat/*.fastq.gz 03_assemblies/${i}/deconcat/blastn 03_assemblies/${i}/deconcat/multimer_mapping
 done > 03_assemblies/deconcat.log
 
 # 2.3 Pulir assemblies
@@ -104,7 +108,7 @@ for i in $(cat samples); do
     # If FASTQ header contains RG:Z:, run dorado with --add-fastq-rg
     if printf '%s\n' "$header" | grep -q 'RG:Z:'; then
         echo "$i contains RG:Z: tag"
-        dorado aligner --add-fastq-rg --output-dir "$outdir" "$asm" "$fq"
+        $dorado_cmd aligner --add-fastq-rg --output-dir "$outdir" "$asm" "$fq"
 		model=$(zcat $fq | head -n1 | grep -o 'dna_[^[:space:]]*' | rev | cut -f3- -d'_' | rev)
   		rg=$(zcat $fq | head -n1 | cut -f3 | cut -f3 -d':')
 		samtools addreplacerg -w -r "@RG\tID:${rg}\tDS:basecall_model=${model}" -o $outdir/$i.RG.bam -O bam $outdir/$i.bam
@@ -112,15 +116,17 @@ for i in $(cat samples); do
         bam=$outdir/$i.RG.bam
     else
         echo "$i does NOT contain RG:Z: tag"
-        dorado aligner --output-dir "$outdir" "$asm" "$fq"
+        $dorado_cmd aligner --output-dir "$outdir" "$asm" "$fq"
         samtools addreplacerg -r "@RG\tID:A\tDS:basecall_model=`gzip -cd "$fq" | head -n 1 | awk -F 'basecall_model_version_id=' '{print $2}'`" $outdir/$i.bam -o $outdir/$i.RG.bam -O bam
         rm $outdir/$i.bam $outdir/$i.bam.bai
         bam=$outdir/$i.RG.bam
     fi
     samtools index $bam
-    dorado polish --batchsize 6 $bam $asm -o $outdir
+    $dorado_cmd polish --bacteria --batchsize 6 $bam $asm -o $outdir
     cp $outdir/consensus.fasta 03_assemblies/$i.fasta
 done
+rm -r .temp_dorado_model*
+rm 03_assemblies/*/dorado_polish/*RG.bam*
 
 # 2.4 Recircularizar
 for i in $(cat samples); do
@@ -142,7 +148,7 @@ conda activate pitis_tax
 
 # 3.1 Taxonomía de reads con Kraken2
 mkdir -p 04_taxonomies/kraken2
-if [ "$ordenador" = "r" ]; then
+if [ "$ordenador" == "r" ]; then
     # Tristemente, en mi ordenador no se puede cargar la db en memoria, peta.
     for i in $(cat samples); do
         kraken2 --db $kraken_db --minimum-base-quality 10 --minimum-hit-groups 100 --output 04_taxonomies/kraken2/${i}.out --use-names  --report 04_taxonomies/kraken2/${i}.report --gzip-compressed  02_filter/${i}.fastq.gz  --threads 30
