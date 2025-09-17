@@ -260,7 +260,7 @@ def main():
     lista_cepas['Barcode'] = lista_cepas['Barcode'].str.replace(r'barcode', '', regex=True)
 
     # Añadir muestras nuevas
-    nuevas_filas = lista_cepas[~lista_cepas['ID único'].isin(datos_seq['ID único'])]
+    nuevas_filas = lista_cepas[~lista_cepas['ID único'].isin(datos_seq['ID único'])][["Nº Cultivo", "Cepario", "ID único", "[DNA]"]]
     datos_seq = pd.concat([datos_seq, nuevas_filas], ignore_index=True)
 
     # Diccionarios con información técnica de la secuenciación
