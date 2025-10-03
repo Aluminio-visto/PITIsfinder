@@ -105,25 +105,36 @@ for i in $(cat samples); do
     # read the first header line (robust)
     header=$(gzip -cd -- "$fq" | sed -n '1p' || true)
 
+	# If FASTQ header indicates r9.4.1 flowcell
+    if printf '%s\n' "$header" | grep -q 'dna_r9.4.1'; then
+        medaka_consensus -b 4 -i 02_filter/${i}.fastq.gz -d $asm -o 03_assemblies/${i}/medaka  -m r941_e81_sup_g514 -t 30
+        mv 03_assemblies/${i}/medaka/consensus.fasta 03_assemblies/${i}.fasta
+        rm -r 03_assemblies/${i}/medaka/
+
     # If FASTQ header contains RG:Z:, run dorado with --add-fastq-rg
-    if printf '%s\n' "$header" | grep -q 'RG:Z:'; then
+    elif printf '%s\n' "$header" | grep -q 'RG:Z:'; then
         echo "$i contains RG:Z: tag"
         $dorado_cmd aligner --add-fastq-rg --output-dir "$outdir" "$asm" "$fq"
-		model=$(zcat $fq | head -n1 | grep -o 'dna_[^[:space:]]*' | rev | cut -f3- -d'_' | rev)
-  		rg=$(zcat $fq | head -n1 | cut -f3 | cut -f3 -d':')
-		samtools addreplacerg -w -r "@RG\tID:${rg}\tDS:basecall_model=${model}" -o $outdir/$i.RG.bam -O bam $outdir/$i.bam
- 		rm $outdir/$i.bam $outdir/$i.bam.bai
+        model=$(zcat $fq | head -n1 | grep -o 'dna_[^[:space:]]*' | rev | cut -f3- -d'_' | rev)
+        rg=$(zcat $fq | head -n1 | cut -f3 | cut -f3 -d':')
+        samtools addreplacerg -w -r "@RG\tID:${rg}\tDS:basecall_model=${model}" -o $outdir/$i.RG.bam -O bam $outdir/$i.bam
+        rm $outdir/$i.bam $outdir/$i.bam.bai
         bam=$outdir/$i.RG.bam
+        samtools index $bam
+        $dorado_cmd polish --bacteria --batchsize 6 $bam $asm -o $outdir
+        cp $outdir/consensus.fasta 03_assemblies/$i.fasta
+
     else
         echo "$i does NOT contain RG:Z: tag"
         $dorado_cmd aligner --output-dir "$outdir" "$asm" "$fq"
         samtools addreplacerg -r "@RG\tID:A\tDS:basecall_model=`gzip -cd "$fq" | head -n 1 | awk -F 'basecall_model_version_id=' '{print $2}'`" $outdir/$i.bam -o $outdir/$i.RG.bam -O bam
         rm $outdir/$i.bam $outdir/$i.bam.bai
         bam=$outdir/$i.RG.bam
+        samtools index $bam
+        $dorado_cmd polish --bacteria --batchsize 6 $bam $asm -o $outdir
+        cp $outdir/consensus.fasta 03_assemblies/$i.fasta
     fi
-    samtools index $bam
-    $dorado_cmd polish --bacteria --batchsize 6 $bam $asm -o $outdir
-    cp $outdir/consensus.fasta 03_assemblies/$i.fasta
+
 done
 rm -r .temp_dorado_model*
 rm 03_assemblies/*/dorado_polish/*RG.bam*
