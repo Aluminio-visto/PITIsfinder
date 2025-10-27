@@ -159,18 +159,11 @@ conda activate pitis_tax
 
 # 3.1 Taxonomía de reads con Kraken2
 mkdir -p 04_taxonomies/kraken2
-if [ "$ordenador" == "r" ]; then
-    # Tristemente, en mi ordenador no se puede cargar la db en memoria, peta.
-    for i in $(cat samples); do
-        kraken2 --db $kraken_db --minimum-base-quality 10 --minimum-hit-groups 100 --output 04_taxonomies/kraken2/${i}.out --use-names  --report 04_taxonomies/kraken2/${i}.report --gzip-compressed  02_filter/${i}.fastq.gz  --threads 30
-    done
-else
-    cp $kraken_db/*.k2d /dev/shm
-    for i in $(cat samples); do
-        kraken2 --memory-mapping --db /dev/shm --minimum-base-quality 10 --minimum-hit-groups 100 --output 04_taxonomies/kraken2/${i}.out --use-names  --report 04_taxonomies/kraken2/${i}.report --gzip-compressed  02_filter/${i}.fastq.gz  --threads 30
-    done
-    rm /dev/shm/*.k2d
-fi
+cp $kraken_db/*.k2d /dev/shm
+for i in $(cat samples); do
+    kraken2 --memory-mapping --db /dev/shm --minimum-base-quality 10 --minimum-hit-groups 100 --output 04_taxonomies/kraken2/${i}.out --use-names  --report 04_taxonomies/kraken2/${i}.report --gzip-compressed  02_filter/${i}.fastq.gz  --threads 30
+done
+rm /dev/shm/*.k2d
 
 # 3.2 Asignar taxonomía con GAMBIT
 gambit -d $gambit_db query -o 04_taxonomies/gambit.csv 03_assemblies/*.fasta
@@ -226,7 +219,7 @@ for j in $(cat samples); do
     for i in $(find 08_Anotacion/${j}/mob_recon/*fasta  -size -600k -size +1k); do # Aplicar copla a los contigs pequeños (<600kb), sospechosos de ser plásmidos
         new_name=$(echo $i | rev | cut -f1 -d'/' | cut -f2- -d'.' | cut -f1 -d'_' | rev)    # Sacar el grupo del plásmido
         cp ${i} 05_plasmids/${new_name}_${j}.fasta
-        echo "Sample: ${j}" && echo "Contig: ${i:(-11):5}" &&  python3 ~/Programs/copla/bin/copla.py ${i} /home/usuario/Programs/copla/databases/Copla_RS84/RS84f_sHSBM.pickle /home/usuario/Programs/copla/databases/Copla_RS84/CoplaDB.fofn 08_Anotacion/${j}/copla
+		echo "Sample: ${j}" && echo "Contig: ${i:(-11):5}" &&  docker run --rm -v $(pwd):/tmp rpalcab/copla:1.0 copla /tmp/${i} /data/app/databases/Copla_RS84/RS84f_sHSBM.pickle /data/app/databases/Copla_RS84/CoplaDB.fofn /tmp/08_Anotacion/${j}/copla
     done  >> copla.txt
 done
 
